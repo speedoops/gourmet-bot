@@ -112,8 +112,8 @@ def robotQueryCommand(msg):
 
 # 处理管理员聊天信息
 admins = [bot.self] 
-admins.append(ensure_one(bot.friends().search(nick_name='刘德')))
-admins.append(ensure_one(bot.friends().search(nick_name='津')))
+admins.append(ensure_one(bot.friends().search(nick_name=u'刘德')))
+admins.append(ensure_one(bot.friends().search(nick_name=u'津')))
 @bot.register(admins, msg_types=TEXT, except_self=False)
 def admins_msgproc(msg):
     logger.info('ADMIN::TEXT %s: %s, %s' % (msg.sender, msg.type, msg.text)) 
@@ -127,7 +127,7 @@ def admins_sharing_proc(msg):
 # 管理群内的消息处理
 groups = []
 #groups.append(ensure_one(bot.groups().search('水果吃货群')))
-groups.append(ensure_one(bot.groups().search('津果机器人')))
+groups.append(ensure_one(bot.groups().search(u'津果机器人')))
 @bot.register(groups, except_self=False)
 def groups_msgproc(msg):
     #from_user = msg.member if isinstance(msg.chat, Group) else msg.sender
