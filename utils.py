@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
  
-import urllib.request
+from urllib.request import urlopen
 import json
 import sys
 import re
@@ -10,7 +10,7 @@ logger = logging.getLogger()
 
 def getComCode(code):
     url = 'http://www.kuaidi100.com/autonumber/autoComNum?text=' + code
-    page = urllib.request.urlopen(url)
+    page = urlopen(url)
     jsonStr = page.read().decode('utf8')
     print(jsonStr)
     jsonObj = json.loads(jsonStr)
@@ -21,7 +21,7 @@ def getExpressStatus(code):
     print('company: ' + company)
     
     url='http://www.kuaidi100.com/query?type=%s&postid=%s' % (company,code)
-    page = urllib.request.urlopen(url)
+    page = urlopen(url)
     jsonStr = page.read().decode('utf8')
     print(jsonStr)
     jsonObj = json.loads(jsonStr)
@@ -46,8 +46,8 @@ def execCmd(cmd):
         return 'Exception: %s' % e
 
 if __name__ == "__main__":  
-    print(execCmd('grep a test.py|head -n 1'))  
-    #print('\n' + getExpressStatus('175032217629') + '\n')
+    #print(execCmd('grep a test.py|head -n 1'))  
+    print('\n' + getExpressStatus('175032217629') + '\n')
     '''
     while True:
         try:
