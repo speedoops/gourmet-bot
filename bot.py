@@ -69,7 +69,12 @@ def friends_msgproc(msg):
             #msg.sender.send_file('file.txt')
             return utils.execCmd('echo "hello"')
     if msg.text.startswith('...') or msg.text.startswith('。。。'):
-        return '{} -> {}'.format(msg.sender, msg.text)     
+        return '{} -> {}'.format(msg.sender, msg.text)   
+
+@bot.register(Friend, msg_types=ATTACHMENT , except_self=False)
+def friends_fileproc(msg):
+    logger.info('FRIEND %s: %s, %s' % (msg.sender, msg.type, msg.text)) 
+    msg.get_file('.')
 
 # TODO: 这个只能被管理员调用，安全性
 def robotQueryCommand(msg):
@@ -79,7 +84,7 @@ def robotQueryCommand(msg):
         logger.debug('cmdStr=%s' % cmdStr)
         # b'@\xe5\x88\x98\xe5\xbe\xb7 !#: ls'
         # b'@\xe5\x88\x98\xe5\xbe\xb7\xe2\x80\x85!#: ls'
-        match = re.match(r'!(?P<code>.*?): (?P<text>.*)', cmdStr)
+        match = re.match(r'!(?P<code>.*?): (?P<text>.*)', cmdStr, re.DOTALL)
         #logger.debug(msg.text.encode())
         if match:
             logger.debug('matched' + str(match.groups()))
@@ -93,13 +98,18 @@ def robotQueryCommand(msg):
             elif (code == '?'):
                 return utils.getExpressStatus(text)
             elif (code == ''):
-                return utils.execCmd("grep '%s' history.txt" % text)
+                #return utils.execCmd("grep '%s' history.txt" % text)
+                return utils.execCmd("sed -n '/^[^；]*$/d; s/^.*：//; s/。.*//; /.*%s.*/p' history.txt | uniq -u" % text)
             elif (code.isdigit()):
-                return utils.execCmd("grep '%s' history.txt | head -n %s" % (text, code))
+                return utils.execCmd("sed -n '/^[^；]*$/d; s/^.*：//; s/。.*//; /.*%s.*/p' history.txt | uniq -u | head -n %s" % (text, code))
+            elif (code == '*'):
+                return utils.substitute_string(text)
+            elif (code == 'f'):
+                msg.sender.send_file(text)
             else:
                 return '命令格式为：!?: ***' # TODO
         elif cmdStr.isdigit(): # MEMO：判断是否为数字
-            return utils.getExpressStatus(cmdStr)            
+            return utils.getExpressStatus(cmdStr)
         elif cmdStr.startswith('file'):
             msg.sender.send_file('history.txt')
             pass
@@ -126,7 +136,7 @@ def admins_sharing_proc(msg):
 
 # 管理群内的消息处理
 groups = []
-#groups.append(ensure_one(bot.groups().search('水果吃货群')))
+#groups.append(ensure_one(bot.groups().search(u'水果吃货群')))
 groups.append(ensure_one(bot.groups().search(u'津果机器人')))
 @bot.register(groups, except_self=False)
 def groups_msgproc(msg):

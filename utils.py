@@ -1,10 +1,7 @@
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-try:
-    from urllib2 import urlopen
-except ImportError:
-    from urllib.request import urlopen
-    
+from urllib.request import urlopen
 import json
 import sys
 import re
@@ -12,7 +9,7 @@ import os
 import logging
 logger = logging.getLogger()
 
-def getComCode(code):
+def _getComCode(code):
     url = 'http://www.kuaidi100.com/autonumber/autoComNum?text=' + code
     page = urlopen(url)
     jsonStr = page.read().decode('utf8')
@@ -21,7 +18,7 @@ def getComCode(code):
     return jsonObj.get('auto')[0].get('comCode')
     
 def getExpressStatus(code):
-    company = getComCode(code)
+    company = _getComCode(code)
     print('company: ' + company)
     
     url='http://www.kuaidi100.com/query?type=%s&postid=%s' % (company,code)
@@ -38,7 +35,7 @@ def getExpressStatus(code):
     return '%s: %s\n%s %s' % (code, status, 
         jsonObj.get('data')[0].get('time'), jsonObj.get('data')[0].get('context'))
     
-def execCmd(cmd): 
+def execCmd(cmd, errmsg=None): 
     logger.debug('execCmd: ' + cmd)
     try:
         r = os.popen(cmd)  
@@ -47,11 +44,56 @@ def execCmd(cmd):
         result = '$ %s\n%s' %(cmd, text)
         return result
     except Exception as e:
+        if errmsg:
+            return errmsg
         return 'Exception: %s' % e
 
-if __name__ == "__main__":  
-    #print(execCmd('grep a test.py|head -n 1'))  
-    print('\n' + getExpressStatus('175032217629') + '\n')
+# def getOneAddress(name):
+#     ret = execCmd("grep '%s' history.txt" % name)
+#     return ret.replace('\n', '|')
+
+def getOneAddress(word):
+    list = []
+    with open('history.txt', encoding='utf-8') as fin:
+        for line in fin:
+            match = re.match(r'^[^：]*：(?P<address>.+?)；(?P<name>.+?)，(?P<phone>\d{11})。.*$', line)
+            if match:
+                line = '%s；%s，%s' % (match.group('address'), match.group('name'), match.group('phone'))
+                if re.match(r'.*%s.*' % word, line):
+                    return line
+
+def getUserAddresses(input):
+    isPattern = False
+    pattern = ''
+    output = ''
+
+    for ch in input:
+        if ch == '{':
+            isPattern = True
+            continue
+        elif ch == '}':
+            output += '[%s]' % getOneAddress(pattern)
+            isPattern = False
+            pattern = ''
+            continue
+
+        if isPattern:
+            pattern += ch
+        else:
+            output += ch
+
+    return output
+
+
+if __name__ == "__main__":
+    input = '中文，hello,{code},dldlflf{bb} dkkrkzhon'
+    output = getUserAddresses(input)
+    print(output)
+
+    #print(execCmd('grep a test.py|head -n 1')) 
+
+    #print('\n' + getExpressStatus('175032217629') + '\n')
+
     '''
     while True:
         try:
