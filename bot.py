@@ -67,7 +67,6 @@ def friends_fileproc(msg):
 def robotQueryCommand(msg):
     LOG.info('robotQueryCommand %s: %s, %s' %
              (msg.sender, msg.type, msg.text))
-    reply_to = msg.member if isinstance(msg.chat, wxpy.Group) else msg.sender
     try:
         cmdStr = re.sub(r'@[^! ]* *', "", msg.text)  # MEMO：字符串替换
         LOG.debug('cmdStr=%s' % cmdStr)
@@ -95,13 +94,13 @@ def robotQueryCommand(msg):
             elif (code == '*'):
                 return utils.replace_with_addresses(text)
             elif (code == 'f'):
-                reply_to.send_file(text)
+                msg.sender.send_file(text)
             else:
                 return '命令格式错误，请输入？？？查询帮助'
         elif cmdStr.isdigit():  # MEMO：判断是否为数字
             return utils.get_shipment_status(cmdStr)
         elif cmdStr.startswith('file'):
-            reply_to.send_file('history.txt')
+            msg.sender.send_file('history.txt')
             pass
         elif cmdStr.startswith('???') or cmdStr.startswith('？？？'):
             return ''' 帮助，支持的命令格式如下：
@@ -115,7 +114,7 @@ def robotQueryCommand(msg):
 !#: 系统命令 => 调试命令：执行系统命令
                 '''
         elif cmdStr.startswith('...') or cmdStr.startswith('。。。'):
-            return '{} -> {}'.format(reply_to, msg.text)
+            return '{} -> {}'.format(msg.sender, msg.text)
         else:
             return None  # TODO
     except Exception as e:
