@@ -105,7 +105,7 @@ def robotQueryCommand(msg):
             pass
         elif cmdStr.startswith('???') or cmdStr.startswith('？？？'):
             return ''' 帮助，支持的命令格式如下：
-        
+
 !+: 记录内容 => 添加记录
 !1: 关键词 => 按关键词查询记录
 !: 关键词 => 按关键词查询，返回多条地址信息（相同的地址信息合并）
@@ -119,6 +119,7 @@ def robotQueryCommand(msg):
         else:
             return None  # TODO
     except Exception as e:
+        LOG.exception(e)
         return 'Exception: %s' % e
 
 

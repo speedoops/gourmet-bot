@@ -32,7 +32,7 @@ def detect_shipment_carrier(tracking_number):
         #logger.debug("carrier_code for %s is: %s", tracking_number, carrier_code)
         return carrier_code
     except Exception as e:
-        logger.error('detect_shipment_carrier: %s', e)
+        logger.error('detect_shipment_carrier(%s): %s', tracking_number, e)
         return None
 
 
@@ -61,7 +61,7 @@ def get_shipment_status(tracking_number, carrier_code=None):
         else:
             return "%s(%s): %s" % (tracking_number, carrier_code, jsonObj.get("message"))
     except Exception as e:
-        logger.error('get_shipment_status: %s', e)
+        logger.error('get_shipment_status(%s): %s', tracking_number, e)
         return None
 
 def replace_with_statuses(input):
