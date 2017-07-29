@@ -7,7 +7,7 @@ import sys
 import re
 import os
 import logging
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def execCmd(cmd, errmsg=None):

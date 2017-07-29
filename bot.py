@@ -35,7 +35,7 @@ def default_msgproc(msg):
     注意：优先匹配 后注册 的函数，且仅匹配 一个 注册函数。 
     """
     LOG.info('DEFAULT %s: %s, %s' % (msg.sender, msg.type, msg.text))
-    LOG.debug(vars(msg))
+    #LOG.debug(vars(msg))
 
 
 @bot.register(msg_types=wxpy.SHARING)
@@ -65,14 +65,14 @@ def friends_fileproc(msg):
 
 
 def robotQueryCommand(msg):
-    LOG.info('robotQueryCommand %s: %s, %s' %
-             (msg.sender, msg.type, msg.text))
+    LOG.info('robotQueryCommand %s: %s, %s',
+             msg.sender, msg.type, msg.text)
     try:
         cmdStr = re.sub(r'@[^! ]* *', "", msg.text)  # MEMO：字符串替换
-        LOG.debug('cmdStr=%s' % cmdStr)
+        LOG.debug('remove at, cmdStr=%s', cmdStr)
         # b'@\xe5\x88\x98\xe5\xbe\xb7 !#: ls'
         # b'@\xe5\x88\x98\xe5\xbe\xb7\xe2\x80\x85!#: ls'
-        match = re.match(r'!(?P<code>.*?): (?P<text>.*)', cmdStr, re.DOTALL)
+        match = re.match(r'!(?P<code>.*?):(?P<text>.*)', cmdStr, re.DOTALL)
         # logger.debug(msg.text.encode())
         if match:
             LOG.debug('matched' + str(match.groups()))
@@ -116,6 +116,7 @@ def robotQueryCommand(msg):
         elif cmdStr.startswith('...') or cmdStr.startswith('。。。'):
             return '{} -> {}'.format(msg.sender, msg.text)
         else:
+            LOG.debug('not matched: %s', cmdStr[:10].encode('utf_8') )
             return None  # TODO
     except Exception as e:
         LOG.exception(e)
@@ -154,9 +155,12 @@ def groups_msgproc(msg):
     if (msg.type == wxpy.SHARING) and (msg.sender not in admins):
         LOG.warn('欢迎针对"水果吃法"进行讨论，请勿发表与群主题无关内容，谢谢')  # TODO: return
     if msg.is_at:  # 自己被@时为True
-        return robotQueryCommand(msg)  # TODO: 避免群内太多@自己的消息
+        return robotQueryCommand(msg)
+    elif (msg.sender == bot.self):
+        return robotQueryCommand(msg)
+    else:
+        LOG.debug('sender:%s != self:%s', msg.sender.user_name, bot.self.user_name)
         return None
-    return None
 
 
 def get_new_member_name(msg):

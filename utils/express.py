@@ -12,7 +12,7 @@ https://www.trackingmore.com/api-python.html
 import urllib.request
 import json
 import logging
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def detect_shipment_carrier(tracking_number):
