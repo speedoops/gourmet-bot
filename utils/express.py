@@ -12,7 +12,7 @@ https://www.trackingmore.com/api-python.html
 import urllib.request
 import json
 import logging
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def detect_shipment_carrier(tracking_number):
@@ -25,14 +25,14 @@ def detect_shipment_carrier(tracking_number):
     try:
         urlStr = "http://www.kuaidi100.com/autonumber/autoComNum?text=" + tracking_number
         jsonStr = urllib.request.urlopen(urlStr).read().decode("utf8")
-        # logger.debug(jsonStr)
+        # LOG.debug(jsonStr)
 
         jsonObj = json.loads(jsonStr)
         carrier_code = jsonObj.get("auto")[0].get("comCode")
-        #logger.debug("carrier_code for %s is: %s", tracking_number, carrier_code)
+        #LOG.debug("carrier_code for %s is: %s", tracking_number, carrier_code)
         return carrier_code
     except Exception as e:
-        logger.error('detect_shipment_carrier(%s): %s', tracking_number, e)
+        LOG.error('detect_shipment_carrier(%s): %s', tracking_number, e)
         return None
 
 
@@ -61,7 +61,7 @@ def get_shipment_status(tracking_number, carrier_code=None):
         else:
             return "%s(%s): %s" % (tracking_number, carrier_code, jsonObj.get("message"))
     except Exception as e:
-        logger.error('get_shipment_status(%s): %s', tracking_number, e)
+        LOG.error('get_shipment_status(%s): %s', tracking_number, e)
         return None
 
 def replace_with_statuses(input):

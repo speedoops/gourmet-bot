@@ -6,7 +6,8 @@ import logging
 LOG = logging.getLogger()
 
 def cmdStr(text):
-    return re.sub(r'@[^! ]* *', "", text)  # MEMO：字符串替换
+    #return re.sub(r'@[^! ]* *', "", text)  # MEMO：字符串替换
+    return re.sub(r'@[^\u2005]*[\u2005]*', "", text)  # MEMO：字符串替换
 
 def matchedStr(cmdStr):
     LOG.debug('remove at, cmdStr=%s' % cmdStr)

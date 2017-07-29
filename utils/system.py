@@ -7,17 +7,17 @@ import sys
 import re
 import os
 import logging
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def execCmd(cmd, errmsg=None):
     """ 执行系统命令，并返回命令执行结果。 """
-    logger.debug("execCmd: " + cmd)
+    LOG.debug("execCmd: " + cmd)
     try:
         r = os.popen(cmd)
         text = r.read()
         r.close()
-        result = "$ %s\n%s" % (cmd, text)
+        result = "%s$ %s\n%s" % (os.getcwd(), cmd, text)
         return result
     except Exception as e:
         if errmsg:

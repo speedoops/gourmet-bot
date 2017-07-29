@@ -9,8 +9,28 @@ import logging.config
 import wxpy
 import utils
 
+def setup_logging(
+    default_path='logging.json', 
+    default_level=logging.INFO,
+    env_key='LOG_CFG'
+):
+    """Setup logging configuration
+ 
+    """
+    path = default_path
+    value = os.getenv(env_key, None)
+    if value:
+        path = value
+    if os.path.exists(path):
+        import json
+        with open(path, 'rt') as f:
+            config = json.load(f)
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+
 # 初始化日志
-logging.config.fileConfig("logger.conf")
+setup_logging()
 LOG = logging.getLogger(__name__)
 
 
@@ -68,11 +88,11 @@ def robotQueryCommand(msg):
     LOG.info('robotQueryCommand %s: %s, %s',
              msg.sender, msg.type, msg.text)
     try:
-        cmdStr = re.sub(r'@[^! ]* *', "", msg.text)  # MEMO：字符串替换
+        cmdStr = re.sub(r'@[^ \u2005]*[ \u2005]*', "", msg.text)  # MEMO：字符串替换
         LOG.debug('remove at, cmdStr=%s', cmdStr)
         # b'@\xe5\x88\x98\xe5\xbe\xb7 !#: ls'
         # b'@\xe5\x88\x98\xe5\xbe\xb7\xe2\x80\x85!#: ls'
-        match = re.match(r'!(?P<code>.*?):(?P<text>.*)', cmdStr, re.DOTALL)
+        match = re.match(r'!(?P<code>.*?):[ ]*(?P<text>.*)', cmdStr, re.DOTALL)
         # logger.debug(msg.text.encode())
         if match:
             LOG.debug('matched' + str(match.groups()))
